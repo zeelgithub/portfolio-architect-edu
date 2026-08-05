@@ -27,7 +27,7 @@ export default function EducationPage() {
 
           {/* Timeline */}
           <div className="relative space-y-10 border-l-2 border-gray-400 dark:border-gray-700 pl-8">
-            {/* Master Degree
+            {/* Master Degree */}
             <FadeIn>
               <div className="relative">
                 <div className="absolute w-4 h-4 bg-gray-600 dark:bg-gray-300 rounded-full -left-2 top-6" />
@@ -72,7 +72,7 @@ export default function EducationPage() {
                   </div>
                 </Card>
               </div>
-            </FadeIn> */}
+            </FadeIn>
 
             {/* Bachelor Degree */}
             <FadeIn>
