@@ -6,9 +6,9 @@ type Section = "data" | "llm" | "strategy" | "risk" | "execution" | "telegram" |
 
 const INFO: Record<Exclude<Section, null>, { title: string; detail: string }> = {
   data:      { title: "Data Pipeline", detail: "Pulls live bars from Alpaca, computes indicators, and stores clean features. Enforces point-in-time correctness so no downstream agent ever sees future data." },
-  llm:       { title: "LLM Sentiment Agent", detail: "Reads live news headlines and returns a confidence delta (−1 / 0 / +1). The score adjusts position sizing — it never triggers or blocks a trade on its own." },
-  strategy:  { title: "Strategy Selector Agent", detail: "Classifies the current market regime and picks the right strategy. Outputs a structured TradeIntent — a description of what to do, not an instruction to the broker." },
-  risk:      { title: "Risk Gatekeeper Agent", detail: "Every TradeIntent passes through here before anything touches the broker. Pure logic — no ML, no network calls. Approves, resizes, or vetoes. On any uncertainty, it halts." },
+  llm:       { title: "LLM Sentiment Agent", detail: "Reads live news headlines and returns a confidence delta (−1 / 0 / +1). The score adjusts position sizing; it never triggers or blocks a trade on its own." },
+  strategy:  { title: "Strategy Selector Agent", detail: "Classifies the current market regime and picks the right strategy. Outputs a structured TradeIntent, a description of what to do, not an instruction to the broker." },
+  risk:      { title: "Risk Gatekeeper Agent", detail: "Every TradeIntent passes through here before anything touches the broker. Pure logic: no ML, no network calls. Approves, resizes, or vetoes. On any uncertainty, it halts." },
   execution: { title: "Execution Layer", detail: "The only layer with broker write credentials. Receives pre-approved, pre-sized orders. Routes to Alpaca, captures fills, and reconciles positions back to the shared ledger." },
   telegram:  { title: "Telegram Interface", detail: "A two-way human-in-the-loop channel. The Risk Gatekeeper sends trade proposals to your phone with Approve and Deny buttons. HALT events trigger a structured brief you paste into Claude.ai for diagnosis. You send commands back in plain English and Claude parses your intent." },
 }
@@ -135,7 +135,7 @@ export default function LiveTradingBotDiagram() {
         {/* ── EVENT BUS ─────────────────────────────────────── */}
         <rect x="100" y="444" width="876" height="16" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1"/>
         <text x="538" y="456" textAnchor="middle" fontSize="9" fontWeight="600" fill="#94a3b8" letterSpacing="0.3">
-          Event Bus — all agents communicate through typed, auditable messages · upgradeable to Redis / ZeroMQ
+          Event Bus: all agents communicate through typed, auditable messages · upgradeable to Redis / ZeroMQ
         </text>
 
         {/* ── INTER-GROUP ARROWS ────────────────────────────── */}
