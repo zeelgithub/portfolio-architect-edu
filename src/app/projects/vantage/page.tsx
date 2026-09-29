@@ -1,24 +1,30 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
-import LiveTradingBotDiagram from "@/components/diagrams/LiveTradingBotDiagram"
 import { projects } from "@/data/projects"
 
 const STATS = [
-  { value: "1.29", label: "backtest Sharpe ratio over 4.1 years (SPY: 1.21)" },
-  { value: "−5.4%", label: "max drawdown, about a third of SPY's" },
-  { value: "p = 0.040", label: "validated strategy (significance test)" },
-  { value: "600+", label: "automated tests, run on every change" },
+  { value: "5 → 1", label: "apps replaced by one screen" },
+  { value: "9 panels", label: "sleep, training, meals, deadlines, money" },
+  { value: "100% local", label: "everything it stores stays on my machine" },
+  { value: "43 tests", label: "plus CI on every push" },
 ]
 
 const USE_CASES = [
-  { who: "Quant and algorithmic traders", what: "A reference architecture for automating a strategy without letting a bug or a model error reach the broker." },
-  { who: "Fintech and brokerage engineering teams", what: "Proven patterns for risk checks, broker reconciliation, and safe shutdown in any system that moves money." },
-  { who: "AI engineering teams", what: "A model for adding AI to a high-stakes system: the AI can read and suggest, while fixed rules decide." },
+  { who: "Busy students and professionals", what: "See the whole day, including deadlines, events, and priorities, without opening five apps." },
+  { who: "Fitness and health trackers", what: "Put sleep, activity, workouts, and nutrition side by side instead of in separate apps." },
+  { who: "Privacy-conscious users", what: "Get a unified personal dashboard without handing all of your data to another cloud service." },
 ]
 
-const PIPELINE = ["Market data", "Strategy selection", "3 strategies", "News check", "Risk check", "Order execution", "Broker reconciliation"]
-const AI_LAYER = ["Command parsing (Claude Haiku)", "Incident triage (Claude Haiku)", "Strategy analysis (Claude Sonnet)", "3 MCP data connectors"]
+const HOW = [
+  { title: "Push", body: "Apple Health sends activity, heart-rate, sleep, and workout data to a secured webhook, stored in local SQLite." },
+  { title: "Pull", body: "Google Calendar, Canvas, and Alpaca are read live on every load, so those panels are never stale." },
+  { title: "Isolate", body: "Every source loads through its own API route, so a failure empties one panel, never the dashboard." },
+]
+
+const SERVICES = ["Apple Health (via Health Auto Export)", "Google Calendar", "Canvas LMS", "Alpaca brokerage", "Open Food Facts"]
+const STACK = ["Next.js", "TypeScript", "SQLite", "Tailwind + shadcn/ui", "Vitest", "GitHub Actions"]
 
 function Chips({ items }: { items: string[] }) {
   return (
@@ -35,13 +41,13 @@ function Chips({ items }: { items: string[] }) {
   )
 }
 
-export default function LiveTradingSystemCaseStudy() {
-  const project = projects.find((p) => p.slug === "autonomous-live-trading-system")
+export default function VantageCaseStudy() {
+  const project = projects.find((p) => p.slug === "vantage")
 
   if (!project) {
     return (
       <section className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-semibold">Autonomous Trading Bot</h1>
+        <h1 className="text-2xl font-semibold">Vantage</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">Project data not found.</p>
       </section>
     )
@@ -56,6 +62,29 @@ export default function LiveTradingSystemCaseStudy() {
           {project.summary}
         </p>
       </div>
+
+      {/* The dashboard, wider than the text column */}
+      <figure className="relative left-1/2 w-[min(72rem,calc(100vw-3rem))] -translate-x-1/2 space-y-3">
+        <a
+          href="/projects/vantage-dashboard.webp"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block overflow-hidden rounded-xl border border-gray-200 shadow-2xl dark:border-gray-700"
+        >
+          <Image
+            src="/projects/vantage-dashboard.webp"
+            alt="The Vantage dashboard: daily focus, finance, supplements, health, sleep, academics, and nutrition panels on one dark screen"
+            width={2400}
+            height={1410}
+            sizes="(max-width: 1200px) 100vw, 1152px"
+            priority
+            className="h-auto w-full"
+          />
+        </a>
+        <figcaption className="text-center text-xs text-gray-500 dark:text-gray-400">
+          The live dashboard, shown with demo data. Click to view full size.
+        </figcaption>
+      </figure>
 
       {/* Impact at a glance */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -90,16 +119,23 @@ export default function LiveTradingSystemCaseStudy() {
       <div className="space-y-3">
         <h2 className="text-xl font-medium">What I Built</h2>
         <p className="text-gray-600 dark:text-gray-300">{project.solution}</p>
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Rule-based trading core</p>
-        <Chips items={PIPELINE} />
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Claude assistant layer (optional, suggests only)</p>
-        <Chips items={AI_LAYER} />
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Connected services</p>
+        <Chips items={SERVICES} />
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Stack</p>
+        <Chips items={STACK} />
       </div>
 
-      {/* Architecture */}
+      {/* How It Works */}
       <div className="space-y-4">
-        <h2 className="text-xl font-medium">System Architecture</h2>
-        <LiveTradingBotDiagram />
+        <h2 className="text-xl font-medium">How It Works</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {HOW.map((h) => (
+            <div key={h.title} className="rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+              <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{h.title}</div>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{h.body}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Key Design Decisions */}
@@ -121,7 +157,8 @@ export default function LiveTradingSystemCaseStudy() {
       {/* Outcomes */}
       <div className="space-y-3">
         <h2 className="text-xl font-medium">Outcomes</h2>
-        <p className="text-gray-600 dark:text-gray-300">{project.outcomes}</p>      </div>
+        <p className="text-gray-600 dark:text-gray-300">{project.outcomes}</p>
+      </div>
 
       {/* GitHub */}
       {project.repoUrl && (

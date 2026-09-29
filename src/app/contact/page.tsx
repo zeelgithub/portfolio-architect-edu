@@ -3,9 +3,9 @@ import Button from "@/components/ui/Button"
 
 export default function ContactPage() {
   return (
-    <section className="space-y-8 max-w-3xl">
+    <section className="max-w-4xl space-y-8 py-16">
 
-      <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-100">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
         Contact
       </h1>
 

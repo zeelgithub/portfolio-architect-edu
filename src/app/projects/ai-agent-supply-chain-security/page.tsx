@@ -1,40 +1,47 @@
 "use client"
 
 import Link from "next/link"
-import GroundedResearchAssistantDiagram from "@/components/diagrams/GroundedResearchAssistantDiagram"
+import SupplyChainSecurityDiagram from "@/components/diagrams/SupplyChainSecurityDiagram"
 import { projects } from "@/data/projects"
 
 const STATS = [
-  { value: "Every claim", label: "traced to a passage in the paper" },
-  { value: "8 reports", label: "from summary to peer-review critique" },
-  { value: "Parallel", label: "tasks run at the same time" },
-  { value: "100% local", label: "no data leaves the machine" },
+  { value: "100%", label: "self-verification on suspicious names (12 of 12)" },
+  { value: "72.2%", label: "verification after the intervention, up from 19.4%" },
+  { value: "2", label: "unclaimed hallucinated package names found" },
+  { value: "381", label: "automated tests, zero network calls" },
 ]
 
 const USE_CASES = [
-  { who: "Research teams and labs", what: "Triage papers and build literature reviews from consistent, evidence-backed notes." },
-  { who: "Reviewers and replication efforts", what: "Get replication checklists and structured critiques tied to the source text." },
-  { who: "Technical due diligence", what: "Assess the claims behind a paper or technical whitepaper before acting on them." },
+  { who: "Security and DevSecOps teams", what: "Evidence on where AI coding agents need an install-time safeguard, and a guard to put there." },
+  { who: "Teams adopting AI coding agents", what: "A drop-in hook that blocks nonexistent packages before an agent can install them." },
+  { who: "AI safety and evaluation researchers", what: "A reproducible harness for measuring agent behavior across tasks, prompts, and models." },
 ]
 
-const REPORT_TYPES = [
-  "Summary",
-  "Key findings with evidence",
-  "Results and metrics",
-  "Limitations",
-  "Experimental setup",
-  "Replication checklist",
-  "Peer-review critique",
-  "Algorithm extraction",
-]
+const GUARD = ["Command parser", "Live registry checks (5 ecosystems)", "Risk scorer", "Decision logger"]
+const RESEARCH = ["48-session experiment", "Prompt-intervention study", "Cross-model comparison", "Responsible disclosure"]
 
-export default function GroundedResearchAssistantCaseStudy() {
-  const project = projects.find((p) => p.slug === "grounded-research-assistant")
+function Chips({ items }: { items: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((r) => (
+        <span
+          key={r}
+          className="rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300"
+        >
+          {r}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+export default function SupplyChainSecurityCaseStudy() {
+  const project = projects.find((p) => p.slug === "ai-agent-supply-chain-security")
 
   if (!project) {
     return (
       <section className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-semibold">Grounded Research Assistant</h1>
+        <h1 className="text-2xl font-semibold">AI Agent Supply-Chain Security</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">Project data not found.</p>
       </section>
     )
@@ -83,26 +90,16 @@ export default function GroundedResearchAssistantCaseStudy() {
       <div className="space-y-3">
         <h2 className="text-xl font-medium">What I Built</h2>
         <p className="text-gray-600 dark:text-gray-300">{project.solution}</p>
-        <p className="text-gray-600 dark:text-gray-300">
-          The user sets the goal, such as {"\""}replication checklist and critique{"\""}, and the planner
-          selects from eight report types:
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {REPORT_TYPES.map((r) => (
-            <span
-              key={r}
-              className="rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300"
-            >
-              {r}
-            </span>
-          ))}
-        </div>
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Install guard</p>
+        <Chips items={GUARD} />
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Research</p>
+        <Chips items={RESEARCH} />
       </div>
 
       {/* Architecture */}
       <div className="space-y-4">
         <h2 className="text-xl font-medium">System Architecture</h2>
-        <GroundedResearchAssistantDiagram />
+        <SupplyChainSecurityDiagram />
       </div>
 
       {/* Key Design Decisions */}

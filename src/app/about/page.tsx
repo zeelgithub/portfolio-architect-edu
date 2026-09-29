@@ -1,7 +1,7 @@
 export default function AboutPage() {
   return (
-    <section className="max-w-3xl mx-auto px-6 py-10 space-y-6 text-gray-800 dark:text-gray-200">
-      <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-100">
+    <section className="max-w-4xl space-y-6 py-16 text-gray-800 dark:text-gray-200">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
         About
       </h1>
 
@@ -14,7 +14,7 @@ export default function AboutPage() {
       </p>
 
       <p className="text-gray-600 dark:text-gray-300">
-        Peer-reviewed publication in Springer (ICTIS'23) on transfer learning for medical image classification. Independent projects — autonomous trading systems, multi-agent debugging pipelines, grounded research workflows — are shipped to production and not prototyped.
+        Peer-reviewed publication in Springer (ICTIS&apos;23) on transfer learning for medical image classification. Independent projects — autonomous trading systems, multi-agent debugging pipelines, grounded research workflows — are shipped to production and not prototyped.
       </p>
 
       <p className="text-sm text-gray-500">

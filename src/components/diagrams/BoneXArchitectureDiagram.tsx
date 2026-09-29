@@ -1,127 +1,108 @@
 "use client"
 
+// Connection types, each with its own color and arrowhead
+const C = {
+  call:  { color: "#334155", id: "bx-call" },
+  train: { color: "#16a34a", id: "bx-train" },
+  load:  { color: "#7c3aed", id: "bx-load" },
+}
+type Kind = keyof typeof C
+
+function Box({ x, y, w, h, title, sub, fill = "#ffffff", stroke = "#7dd3fc", color = "#0c4a6e", dash }: {
+  x: number; y: number; w: number; h: number
+  title: string; sub?: string; fill?: string; stroke?: string; color?: string; dash?: string
+}) {
+  const cx = x + w / 2
+  const cy = y + h / 2
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx="8" fill={fill} stroke={stroke} strokeWidth="1.3" strokeDasharray={dash} />
+      <text x={cx} y={sub ? cy - 3 : cy + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill={color}>{title}</text>
+      {sub && <text x={cx} y={cy + 13} textAnchor="middle" fontSize="9.5" fill="#475569">{sub}</text>}
+    </g>
+  )
+}
+
+function Edge({ d, kind }: { d: string; kind: Kind }) {
+  const { color, id } = C[kind]
+  return <path d={d} fill="none" stroke={color} strokeWidth="1.6" markerEnd={`url(#${id})`} />
+}
+
+function Chip({ x, y, w, label }: { x: number; y: number; w: number; label: string }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height="28" rx="6" fill="#ffffff" stroke="#a78bfa" strokeWidth="1" />
+      <text x={x + w / 2} y={y + 18} textAnchor="middle" fontSize="10" fill="#4c1d95">{label}</text>
+    </g>
+  )
+}
+
+const TRAIN = { fill: "#ffffff", stroke: "#86efac", color: "#14532d" }
+
 export default function BoneXArchitectureDiagram() {
   return (
     <div className="rounded-xl border bg-white dark:bg-gray-900 p-4">
-      <svg
-        viewBox="0 0 900 700"
-        className="block w-full"
-        style={{ height: 560 }}
-      >
-        {/* Arrow marker */}
+      <svg viewBox="0 0 1000 420" className="block w-full h-auto">
         <defs>
-          <marker
-            id="arrow"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="8"
-            markerHeight="8"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-          </marker>
+          {Object.values(C).map(({ color, id }) => (
+            <marker key={id} id={id} viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill={color} />
+            </marker>
+          ))}
         </defs>
 
-        {/* ===== Input ===== */}
-        <rect x="320" y="20" width="260" height="60" rx="12" fill="#eef2f7" stroke="#cbd5e1" />
-        <text x="450" y="48" textAnchor="middle" fontSize="14" fontWeight="600">
-          Input X ray Image
-        </text>
-        <text x="450" y="66" textAnchor="middle" fontSize="11">
-          224 × 224 × 3
-        </text>
+        {/* ── Training (offline) ── */}
+        <rect x="20" y="12" width="960" height="108" rx="10" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.3" />
+        <rect x="32" y="4" width="120" height="17" rx="5" fill="#16a34a" />
+        <text x="92" y="16" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="white">Training (offline)</text>
+        <Box x={35}  y={40} w={180} h={60} title="X-ray Dataset" sub="Stanford MURA · 7 regions" {...TRAIN} />
+        <Box x={245} y={40} w={180} h={60} title="Augmentation" sub="shear · zoom · flip" {...TRAIN} />
+        <Box x={455} y={40} w={220} h={60} title="Transfer Learning" sub="train the head · backbone frozen" {...TRAIN} />
+        <Box x={705} y={40} w={260} h={60} title="Model Artifact" sub="saved Keras model file" fill="#f5f3ff" stroke="#a78bfa" color="#4c1d95" />
+        <Edge d="M215 70 L245 70" kind="train" />
+        <Edge d="M425 70 L455 70" kind="train" />
+        <Edge d="M675 70 L705 70" kind="train" />
 
-        {/* ===== Preprocessing ===== */}
-        <rect x="300" y="110" width="300" height="90" rx="12" fill="#e0f2fe" stroke="#bae6fd" />
-        <text x="450" y="138" textAnchor="middle" fontSize="14" fontWeight="600">
-          Data Preprocessing
-        </text>
-        <text x="450" y="158" textAnchor="middle" fontSize="11">
-          Resize · Normalization · Augmentation
-        </text>
+        {/* ── User ── */}
+        <rect x="40" y="170" width="110" height="30" rx="15" fill="#0f172a" />
+        <text x="95" y="190" textAnchor="middle" fontSize="12" fontWeight="700" fill="white">User</text>
+        <Edge d="M75 200 L75 240" kind="call" />
+        <Edge d="M115 240 L115 200" kind="call" />
+        <Box x={20} y={240} w={150} h={60} title="Web App" sub="upload · view result" fill="#f8fafc" stroke="#cbd5e1" color="#334155" />
 
-        {/* ===== Backbone ===== */}
-        <rect x="200" y="240" width="500" height="140" rx="14" fill="#dcfce7" stroke="#bbf7d0" />
-        <text x="450" y="268" textAnchor="middle" fontSize="15" fontWeight="600">
-          Pre trained MobileNet (ImageNet)
-        </text>
+        {/* ── Inference server ── */}
+        <rect x="200" y="150" width="780" height="255" rx="12" fill="#f0f9ff" stroke="#7dd3fc" strokeWidth="1.6" />
+        <text x="215" y="170" fontSize="12" fontWeight="700" fill="#0c4a6e">Flask Inference Server</text>
 
-        {/* Frozen layers */}
-        <rect x="220" y="292" width="220" height="60" rx="10" fill="#f8fafc" stroke="#cbd5e1" />
-        <text x="330" y="320" textAnchor="middle" fontSize="12" fontWeight="600">
-          Frozen Layers
-        </text>
-        <text x="330" y="338" textAnchor="middle" fontSize="11">
-          Feature Extraction
-        </text>
+        <Edge d="M170 262 L220 262" kind="call" />
+        <text x="174" y="256" fontSize="9" fill="#334155">X-ray</text>
+        <Box x={220} y={240} w={150} h={60} title="Predict Endpoint" sub="receives the upload" />
+        <Box x={400} y={240} w={150} h={60} title="Preprocess" sub="224 × 224 · scale pixels" />
+        <Edge d="M370 270 L400 270" kind="call" />
+        <Edge d="M550 270 L580 270" kind="call" />
 
-        {/* Trainable layers */}
-        <rect x="460" y="292" width="220" height="60" rx="10" fill="#f8fafc" stroke="#cbd5e1" />
-        <text x="570" y="320" textAnchor="middle" fontSize="12" fontWeight="600">
-          Fine Tuned Layers
-        </text>
-        <text x="570" y="338" textAnchor="middle" fontSize="11">
-          Last N Conv Blocks
-        </text>
+        <rect x="580" y="190" width="190" height="160" rx="10" fill="#f5f3ff" stroke="#a78bfa" strokeWidth="1.4" />
+        <text x="675" y="210" textAnchor="middle" fontSize="12" fontWeight="700" fill="#4c1d95">CNN Classifier</text>
+        <Chip x={590} y={222} w={170} label="MobileNet · ImageNet" />
+        <Chip x={590} y={260} w={170} label="dense head + dropout" />
+        <Chip x={590} y={298} w={170} label="softmax · 14 classes" />
 
-        {/* ===== GAP ===== */}
-        <rect x="320" y="410" width="260" height="50" rx="12" fill="#fef3c7" stroke="#fde68a" />
-        <text x="450" y="440" textAnchor="middle" fontSize="13" fontWeight="600">
-          Global Average Pooling
-        </text>
+        <Edge d="M770 270 L800 270" kind="call" />
+        <Box x={800} y={240} w={165} h={60} title="Label Mapper" sub="region + normal / abnormal" />
 
-        {/* ===== Dense ===== */}
-        <rect x="320" y="480" width="260" height="50" rx="12" fill="#ede9fe" stroke="#ddd6fe" />
-        <text x="450" y="510" textAnchor="middle" fontSize="13" fontWeight="600">
-          Dense (ReLU) + Dropout
-        </text>
+        {/* result returns to the user */}
+        <Edge d="M882 300 L882 380 L295 380 L295 300" kind="call" />
+        <text x="590" y="374" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#334155">plain-language result, e.g. {"\""}wrist · abnormal{"\""}</text>
+        <Edge d="M220 285 L170 285" kind="call" />
+        <text x="174" y="298" fontSize="9" fill="#334155">result</text>
 
-        {/* ===== Output ===== */}
-        <rect x="250" y="560" width="400" height="90" rx="14" fill="#fee2e2" stroke="#fecaca" />
-        <text x="450" y="590" textAnchor="middle" fontSize="14" fontWeight="600">
-          Output Layer (Softmax)
-        </text>
-        <text x="450" y="612" textAnchor="middle" fontSize="11">
-          Elbow · Finger · Forearm · Hand
-        </text>
-        <text x="450" y="630" textAnchor="middle" fontSize="11">
-          Humerus · Shoulder · Wrist
-        </text>
-
-        {/* ===== Animated flow arrows ===== */}
-        {[
-          ["M450 80 L450 110"],
-          ["M450 200 L450 240"],
-          ["M450 380 L450 410"],
-          ["M450 460 L450 480"],
-          ["M450 530 L450 560"],
-        ].map((d, i) => (
-          <path
-            key={i}
-            d={d[0]}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            markerEnd="url(#arrow)"
-            className="flow-line"
-          />
-        ))}
-
-        {/* Moving data packet */}
-        <circle r="4" fill="currentColor">
-          <animateMotion
-            dur="3s"
-            repeatCount="indefinite"
-            path="M450 90 L450 610"
-          />
-        </circle>
+        {/* model artifact loaded by the server */}
+        <Edge d="M740 100 L740 190" kind="load" />
+        <text x="748" y="140" fontSize="9" fontWeight="700" fill="#7c3aed">loaded at startup</text>
       </svg>
-
       <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
-        End to end fracture classification pipeline using fine tuned MobileNet with
-        frozen feature extraction layers and task specific adaptation for multi bone
-        fracture detection.
+        Training runs offline and produces one model file. The Flask server loads it at startup, then each upload is preprocessed, classified into one of 14 outcomes, and returned to the user as a plain-language result naming the body region and whether it looks normal or abnormal.
       </p>
     </div>
   )

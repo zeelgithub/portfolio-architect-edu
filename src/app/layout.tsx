@@ -1,15 +1,19 @@
 import "./globals.css"
+import { Inter } from "next/font/google"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import Providers from "@/components/Providers"
 import ScrollToTopButton from "@/components/ui/ScrollToTopButton"
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className="min-h-screen flex flex-col">
         <Providers>
           <Navbar />

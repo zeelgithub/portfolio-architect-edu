@@ -3,27 +3,18 @@ import FadeIn from "@/components/ui/FadeIn"
 
 export default function ExperiencePage() {
   return (
-    <>
-      <div
-        className="fixed inset-0 bg-gradient-to-b
-          from-white via-gray-50 to-gray-100
-          dark:from-gray-950 dark:via-gray-900 dark:to-gray-950
-          -z-10"
-      />
+    <section className="max-w-4xl space-y-12 py-16">
 
-      <section className="py-16 flex justify-center">
-        <div className="max-w-4xl w-full space-y-12">
+      <div>
+        <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100">
+          Experience
+        </h1>
+        <p className="text-xl text-gray-700 dark:text-gray-300 mt-2">
+          Production AI systems across federal health and defense clients.
+        </p>
+      </div>
 
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100">
-              Experience
-            </h1>
-            <p className="text-xl text-gray-700 dark:text-gray-300 mt-2">
-              Production AI systems across federal health and defense clients.
-            </p>
-          </div>
-
-          <div className="relative space-y-10 border-l-2 border-gray-300 dark:border-gray-700 pl-8">
+      <div className="relative space-y-10 border-l-2 border-gray-300 dark:border-gray-700 pl-8">
 
             {/* ── Deloitte (single card, two roles) ── */}
             <div className="relative">
@@ -32,7 +23,7 @@ export default function ExperiencePage() {
                 <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all space-y-8">
 
                   {/* Company header */}
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-wrap justify-between items-start gap-x-4 gap-y-1">
                     <div>
                       <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                         Deloitte Consulting LLP
@@ -41,18 +32,18 @@ export default function ExperiencePage() {
                         Pennsylvania, United States
                       </p>
                     </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap ml-4">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap">
                       Oct 2023 – Present
                     </span>
                   </div>
 
                   {/* Role 1 — AI Consultant Engineer */}
                   <div className="border-l-2 border-gray-200 dark:border-gray-700 pl-5 space-y-3">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-1">
                       <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                         AI Consultant Engineer
                       </h4>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 italic whitespace-nowrap ml-4">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 italic whitespace-nowrap">
                         Jul 2026 – Present
                       </span>
                     </div>
@@ -66,11 +57,11 @@ export default function ExperiencePage() {
 
                   {/* Role 2 — Generative AI Engineer */}
                   <div className="border-l-2 border-gray-200 dark:border-gray-700 pl-5 space-y-3">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-1">
                       <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                         Generative AI Engineer
                       </h4>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 italic whitespace-nowrap ml-4">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 italic whitespace-nowrap">
                         Oct 2023 – Jul 2026
                       </span>
                     </div>
@@ -105,7 +96,7 @@ export default function ExperiencePage() {
               <div className="absolute w-4 h-4 bg-gray-700 dark:bg-gray-300 rounded-full -left-2 top-5" />
               <FadeIn>
                 <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-wrap justify-between items-start gap-x-4 gap-y-1">
                     <div>
                       <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                         Eminence Technology Solutions, LLC.
@@ -114,7 +105,7 @@ export default function ExperiencePage() {
                         Data Analyst · New Jersey, United States
                       </p>
                     </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap ml-4">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap">
                       Dec 2022 – Jun 2023
                     </span>
                   </div>
@@ -138,7 +129,7 @@ export default function ExperiencePage() {
               <div className="absolute w-4 h-4 bg-gray-700 dark:bg-gray-300 rounded-full -left-2 top-5" />
               <FadeIn>
                 <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-wrap justify-between items-start gap-x-4 gap-y-1">
                     <div>
                       <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                         Fractal Analytics
@@ -147,7 +138,7 @@ export default function ExperiencePage() {
                         Machine Learning Intern · New York, United States
                       </p>
                     </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap ml-4">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 italic whitespace-nowrap">
                       Jun 2022 – Dec 2022
                     </span>
                   </div>
@@ -167,9 +158,7 @@ export default function ExperiencePage() {
               </FadeIn>
             </div>
 
-          </div>
-        </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }

@@ -1,241 +1,153 @@
 "use client"
 
-import { useState } from "react"
-
-type Section = "data" | "llm" | "strategy" | "risk" | "execution" | "telegram" | null
-
-const INFO: Record<Exclude<Section, null>, { title: string; detail: string }> = {
-  data:      { title: "Data Pipeline", detail: "Pulls live bars from Alpaca, computes indicators, and stores clean features. Enforces point-in-time correctness so no downstream agent ever sees future data." },
-  llm:       { title: "LLM Sentiment Agent", detail: "Reads live news headlines and returns a confidence delta (−1 / 0 / +1). The score adjusts position sizing; it never triggers or blocks a trade on its own." },
-  strategy:  { title: "Strategy Selector Agent", detail: "Classifies the current market regime and picks the right strategy. Outputs a structured TradeIntent, a description of what to do, not an instruction to the broker." },
-  risk:      { title: "Risk Gatekeeper Agent", detail: "Every TradeIntent passes through here before anything touches the broker. Pure logic: no ML, no network calls. Approves, resizes, or vetoes. On any uncertainty, it halts." },
-  execution: { title: "Execution Layer", detail: "The only layer with broker write credentials. Receives pre-approved, pre-sized orders. Routes to Alpaca, captures fills, and reconciles positions back to the shared ledger." },
-  telegram:  { title: "Telegram Interface", detail: "A two-way human-in-the-loop channel. The Risk Gatekeeper sends trade proposals to your phone with Approve and Deny buttons. HALT events trigger a structured brief you paste into Claude.ai for diagnosis. You send commands back in plain English and Claude parses your intent." },
+// Connection types, each with its own color and arrowhead
+const C = {
+  call:    { color: "#334155", id: "lt-call" },
+  approve: { color: "#ea580c", id: "lt-approve" },
+  ai:      { color: "#7c3aed", id: "lt-ai" },
+  halt:    { color: "#94a3b8", id: "lt-halt" },
 }
+type Kind = keyof typeof C
 
-const LBL = "#9ca3af"
-
-export default function LiveTradingBotDiagram() {
-  const [hover, setHover] = useState<Section>(null)
-
-  const fade = (s: Section) => hover === null || hover === s ? 1 : 0.1
-  const on   = (s: Section) => ({
-    onMouseEnter: () => setHover(s),
-    onMouseLeave: () => setHover(null),
-    style: { cursor: "pointer", opacity: fade(s), transition: "opacity 0.15s" },
-  })
-  const aOp = (a: Section, b: Section) =>
-    hover === null || hover === a || hover === b ? 0.65 : 0.06
-
-  // Phase pill helper
-  const Phase = ({ label, y, color = "#6366f1" }: { label: string; y: number; color?: string }) => (
+function Box({ x, y, w, h, title, sub, fill = "#ffffff", stroke = "#7dd3fc", color = "#0c4a6e", dash }: {
+  x: number; y: number; w: number; h: number
+  title: string; sub?: string; fill?: string; stroke?: string; color?: string; dash?: string
+}) {
+  const cx = x + w / 2
+  const cy = y + h / 2
+  return (
     <g>
-      <rect x="14" y={y} width="72" height="40" rx="7"
-        fill="#eef2ff" stroke="#c7d2fe" strokeWidth="1.2"/>
-      <text x="50" y={y + 15} textAnchor="middle" fontSize="7" fontWeight="800"
-        fill={color} letterSpacing="1.2">{label}</text>
-      <text x="50" y={y + 28} textAnchor="middle" fontSize="9" fill={color} opacity="0.5">↓</text>
+      <rect x={x} y={y} width={w} height={h} rx="8" fill={fill} stroke={stroke} strokeWidth="1.3" strokeDasharray={dash} />
+      <text x={cx} y={sub ? cy - 3 : cy + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill={color}>{title}</text>
+      {sub && <text x={cx} y={cy + 13} textAnchor="middle" fontSize="9.5" fill="#475569">{sub}</text>}
     </g>
   )
+}
 
+function Edge({ d, kind, both = false, halo = false }: { d: string; kind: Kind; both?: boolean; halo?: boolean }) {
+  const { color, id } = C[kind]
+  const dotted = kind === "halt"
   return (
-    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 overflow-hidden">
-      <svg viewBox="0 0 1000 470" className="block w-full" style={{ height: 390 }}>
+    <g>
+      {halo && <path d={d} fill="none" stroke="#ffffff" strokeWidth="6" />}
+      <path d={d} fill="none" stroke={color} strokeWidth={dotted ? 1.4 : 1.6} strokeDasharray={dotted ? "2 3" : undefined}
+        markerEnd={dotted ? undefined : `url(#${id})`} markerStart={both ? `url(#${id})` : undefined} />
+    </g>
+  )
+}
 
+function Chip({ x, y, w, label }: { x: number; y: number; w: number; label: string }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height="26" rx="6" fill="#ffffff" stroke="#fdba74" strokeWidth="1" />
+      <text x={x + w / 2} y={y + 17} textAnchor="middle" fontSize="10" fill="#7c2d12">{label}</text>
+    </g>
+  )
+}
+
+const AI = { stroke: "#a78bfa", color: "#4c1d95" }
+const SRC = { stroke: "#7dd3fc", color: "#0c4a6e" }
+const EXT = { fill: "#f8fafc", stroke: "#94a3b8", color: "#334155", dash: "5 3" }
+
+export default function LiveTradingBotDiagram() {
+  return (
+    <div className="rounded-xl border bg-white dark:bg-gray-900 p-4">
+      <svg viewBox="0 0 1000 560" className="block w-full h-auto">
         <defs>
-          <marker id="arr"  viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0l8 4-8 4z" fill="#94a3b8"/></marker>
-          <marker id="arrG" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0l8 4-8 4z" fill="#16a34a"/></marker>
-          <marker id="arrR" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0l8 4-8 4z" fill="#dc2626"/></marker>
-          <marker id="arrA" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0l8 4-8 4z" fill="#d97706"/></marker>
+          {Object.values(C).map(({ color, id }) => (
+            <marker key={id} id={id} viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill={color} />
+            </marker>
+          ))}
         </defs>
 
-        {/* ── EXTERNAL SOURCES ──────────────────────────────── */}
-        <rect x="96"  y="12" width="188" height="38" rx="8" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.2" strokeDasharray="5 3"/>
-        <text x="190" y="36" textAnchor="middle" fontSize="12" fontWeight="700" fill="#374151">Alpaca Market Feed</text>
+        {/* ── Cognitive plane (optional, propose-only) ── */}
+        <rect x="20" y="12" width="600" height="88" rx="10" fill="#f5f3ff" stroke="#c4b5fd" strokeWidth="1.3" />
+        <text x="35" y="31" fontSize="12" fontWeight="700" fill="#4c1d95">AI Assistant Layer · Claude (optional)</text>
+        <rect x="448" y="4" width="160" height="17" rx="5" fill="#7c3aed" />
+        <text x="528" y="16" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="white">can suggest, never trade</text>
+        <Box x={35}  y={42} w={140} h={46} title="Command Parser" sub="plain-English commands" {...AI} />
+        <Box x={180} y={42} w={140} h={46} title="Incident Triage" sub="explains trading halts" {...AI} />
+        <Box x={325} y={42} w={140} h={46} title="Strategy Analyst" sub="suggests strategy changes" {...AI} />
+        <Box x={470} y={42} w={140} h={46} title="Data Connectors" sub="3 MCP servers" {...AI} />
 
-        <rect x="762" y="12" width="200" height="38" rx="8" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.2" strokeDasharray="5 3"/>
-        <text x="862" y="36" textAnchor="middle" fontSize="12" fontWeight="700" fill="#374151">News Headlines</text>
+        {/* ── Owner + phone control ── */}
+        <rect x="800" y="18" width="110" height="28" rx="14" fill="#0f172a" />
+        <text x="855" y="36" textAnchor="middle" fontSize="12" fontWeight="700" fill="white">Owner</text>
+        <Edge d="M835 46 L835 70" kind="call" />
+        <Edge d="M875 70 L875 46" kind="call" />
+        <Box x={770} y={70} w={170} h={50} title="Telegram Control" sub="approve or reject trades" fill="#f8fafc" stroke="#cbd5e1" color="#334155" />
 
-        {/* ── ORCHESTRATOR BORDER ───────────────────────────── */}
-        <rect x="12" y="62" width="976" height="342" rx="14"
-          fill="none" stroke="#6366f1" strokeWidth="1.6" strokeDasharray="8 4"/>
-        <rect x="12" y="50" width="178" height="24" rx="6" fill="#6366f1"/>
-        <text x="22" y="67" fontSize="11" fontWeight="700" fill="white">Orchestrator</text>
+        {/* ── Proposal sources (many) ── */}
+        <Box x={20} y={130} w={180} h={46} title="Market Data" sub="daily prices and indicators" {...SRC} />
+        <Edge d="M110 176 L110 200" kind="call" />
+        <Box x={20} y={200} w={180} h={56} title="Trading Strategies" sub="trend, breakout, mean reversion" {...SRC} />
+        <Box x={20} y={275} w={180} h={50} title="Idea Discovery" sub="scans ~4,000 stocks" {...SRC} />
+        <Box x={20} y={345} w={180} h={50} title="Phone Orders" sub="manual buys from the phone" {...SRC} />
+        <Box x={20} y={415} w={180} h={50} title="Strategy Changes" sub="suggested by AI or owner" {...SRC} />
 
-        {/* ── PHASE COLUMN ──────────────────────────────────── */}
-        <line x1="92" y1="68" x2="92" y2="402" stroke="#e0e7ff" strokeWidth="1.2"/>
-        <Phase label="PERCEIVE" y={76} />
-        <Phase label="PLAN"     y={176} />
-        <Phase label="GUARD"    y={266} />
-        <Phase label="ACT"      y={356} />
+        <Box x={222} y={210} w={96} h={40} title="News Check" sub="reduce / block" {...SRC} />
+        <Edge d="M200 230 L222 230" kind="call" />
+        <Edge d="M318 230 L340 230" kind="call" />
+        <Edge d="M200 300 L340 300" kind="call" />
+        <Edge d="M200 370 L340 370" kind="call" />
+        <Edge d="M200 440 L340 440" kind="call" />
+        <text x="270" y="293" textAnchor="middle" fontSize="9" fill="#334155">trade ideas</text>
 
-        {/* ── DATA PIPELINE ─────────────────────────────────── */}
-        <g {...on("data")}>
-          <rect x="100" y="76" width="162" height="40" rx="9" fill="#f0f9ff" stroke="#7dd3fc" strokeWidth="1.3"/>
-          <text x="181" y="102" textAnchor="middle" fontSize="12" fontWeight="700" fill="#075985">Data Ingestor</text>
+        {/* ── Risk gatekeeper (one) ── */}
+        <rect x="340" y="130" width="160" height="335" rx="12" fill="#fff7ed" stroke="#fb923c" strokeWidth="1.8" />
+        <text x="420" y="152" textAnchor="middle" fontSize="13" fontWeight="700" fill="#7c2d12">Risk Gatekeeper</text>
+        <text x="420" y="167" textAnchor="middle" fontSize="9.5" fill="#475569">rule-based · can only reject</text>
+        {[
+          "daily loss limit",
+          "total risk limit",
+          "correlated risk limit",
+          "position size limits",
+          "price sanity check",
+          "order rate limits",
+        ].map((l, i) => (
+          <Chip key={l} x={350} y={180 + i * 36} w={140} label={l} />
+        ))}
+        <text x="420" y="412" textAnchor="middle" fontSize="10" fontWeight="700" fill="#7c2d12">approve · resize · reject</text>
+        <text x="420" y="428" textAnchor="middle" fontSize="9" fill="#475569">never starts a trade</text>
 
-          <rect x="284" y="76" width="162" height="40" rx="9" fill="#f0f9ff" stroke="#7dd3fc" strokeWidth="1.3"/>
-          <text x="365" y="102" textAnchor="middle" fontSize="12" fontWeight="700" fill="#075985">Feature Store</text>
+        {/* ── Approval loop ── */}
+        <Edge d="M500 150 L720 150 L720 95 L770 95" kind="approve" halo />
+        <text x="585" y="143" fontSize="9" fontWeight="700" fill="#ea580c">trade for approval</text>
+        <Edge d="M800 120 L800 215 L660 215 L660 250" kind="approve" />
+        <text x="808" y="190" fontSize="9" fontWeight="700" fill="#ea580c">owner approves</text>
+        <text x="808" y="201" fontSize="9" fill="#ea580c">(risk checked again)</text>
 
-          <rect x="468" y="76" width="188" height="40" rx="9" fill="#f5f3ff" stroke="#a5b4fc" strokeWidth="1.3"/>
-          <text x="562" y="102" textAnchor="middle" fontSize="12" fontWeight="700" fill="#3730a3">Regime Classifier Agent</text>
+        {/* ── Execution (the only component that acts) ── */}
+        <Box x={580} y={250} w={160} h={60} title="Order Manager" sub="the only part that can trade" fill="#dcfce7" stroke="#86efac" color="#14532d" />
+        <Edge d="M740 280 L800 280" kind="call" both />
+        <text x="746" y="273" fontSize="9" fill="#334155">orders · fills</text>
+        <Box x={800} y={250} w={180} h={60} title="Alpaca Broker" sub="paper account · stop orders" {...EXT} />
 
-          <line x1="262" y1="96" x2="284" y2="96" stroke="#94a3b8" strokeWidth="1.4" markerEnd="url(#arr)"/>
-          <line x1="446" y1="96" x2="468" y2="96" stroke="#94a3b8" strokeWidth="1.4" markerEnd="url(#arr)"/>
-        </g>
+        {/* ── Reconciliation loop ── */}
+        <Edge d="M890 310 L890 345" kind="call" />
+        <Box x={800} y={345} w={180} h={50} title="Reconciler" sub="checks against the broker" {...SRC} />
+        <Edge d="M800 370 L740 370" kind="call" />
+        <Box x={580} y={345} w={160} h={50} title="State Store" sub="positions, halts, audit log" {...SRC} />
+        <Edge d="M580 370 L500 370" kind="call" halo />
+        <text x="508" y="364" fontSize="9" fill="#334155">current positions</text>
 
-        {/* ── LLM SENTIMENT AGENT ───────────────────────────── */}
-        <g {...on("llm")}>
-          <rect x="762" y="76" width="210" height="40" rx="9" fill="#fffbeb" stroke="#fcd34d" strokeWidth="1.3"/>
-          <text x="867" y="102" textAnchor="middle" fontSize="12" fontWeight="700" fill="#78350f">LLM Sentiment Agent</text>
-        </g>
+        {/* AI reads state */}
+        <Edge d="M560 100 L560 330 L610 330 L610 345" kind="ai" halo />
+        <text x="566" y="240" fontSize="9" fontWeight="700" fill="#7c3aed">reads state</text>
 
-        {/* ── STRATEGY SELECTOR AGENT ───────────────────────── */}
-        <g {...on("strategy")}>
-          <rect x="264" y="176" width="430" height="40" rx="9" fill="#eef2ff" stroke="#c7d2fe" strokeWidth="1.4"/>
-          <text x="479" y="202" textAnchor="middle" fontSize="12" fontWeight="700" fill="#312e81">Strategy Selector Agent</text>
-        </g>
-
-        {/* ── RISK GATEKEEPER AGENT ─────────────────────────── */}
-        <g {...on("risk")}>
-          <rect x="264" y="266" width="290" height="40" rx="9" fill="#fff1f2" stroke="#fca5a5" strokeWidth="1.6"/>
-          <text x="409" y="292" textAnchor="middle" fontSize="12" fontWeight="700" fill="#881337">Risk Gatekeeper Agent</text>
-
-          <rect x="596" y="266" width="150" height="40" rx="9" fill="#fff1f2" stroke="#fca5a5" strokeWidth="1.2" strokeDasharray="5 3"/>
-          <text x="671" y="292" textAnchor="middle" fontSize="13" fontWeight="800" fill="#dc2626">HALT</text>
-        </g>
-
-        {/* ── EXECUTION LAYER ───────────────────────────────── */}
-        <g {...on("execution")}>
-          <rect x="100" y="356" width="175" height="36" rx="8" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.3"/>
-          <text x="187" y="379" textAnchor="middle" fontSize="12" fontWeight="700" fill="#14532d">Order Router</text>
-
-          <rect x="292" y="356" width="175" height="36" rx="8" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.3"/>
-          <text x="379" y="379" textAnchor="middle" fontSize="12" fontWeight="700" fill="#14532d">Alpaca Brokerage</text>
-
-          <rect x="484" y="356" width="175" height="36" rx="8" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.3"/>
-          <text x="571" y="379" textAnchor="middle" fontSize="12" fontWeight="700" fill="#14532d">Fill Handler</text>
-
-          <rect x="676" y="356" width="175" height="36" rx="8" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.3"/>
-          <text x="763" y="379" textAnchor="middle" fontSize="12" fontWeight="700" fill="#14532d">Position Ledger</text>
-
-          <line x1="275" y1="374" x2="292" y2="374" stroke="#16a34a" strokeWidth="1.4" markerEnd="url(#arrG)"/>
-          <line x1="467" y1="374" x2="484" y2="374" stroke="#16a34a" strokeWidth="1.4" markerEnd="url(#arrG)"/>
-          <line x1="659" y1="374" x2="676" y2="374" stroke="#16a34a" strokeWidth="1.4" markerEnd="url(#arrG)"/>
-        </g>
-
-        {/* ── TELEGRAM INTERFACE (external, right side) ─────── */}
-        <g {...on("telegram" as Section)}>
-          <rect x="810" y="248" width="172" height="60" rx="10"
-            fill="#f0fdf4" stroke="#86efac" strokeWidth="1.4" strokeDasharray="5 3"/>
-          <text x="896" y="274" textAnchor="middle" fontSize="12" fontWeight="700" fill="#14532d">Telegram</text>
-          <text x="896" y="292" textAnchor="middle" fontSize="10" fontWeight="500" fill="#166534">Human-in-the-Loop</text>
-        </g>
-
-        {/* ── EVENT BUS ─────────────────────────────────────── */}
-        <rect x="100" y="444" width="876" height="16" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1"/>
-        <text x="538" y="456" textAnchor="middle" fontSize="9" fontWeight="600" fill="#94a3b8" letterSpacing="0.3">
-          Event Bus: all agents communicate through typed, auditable messages · upgradeable to Redis / ZeroMQ
-        </text>
-
-        {/* ── INTER-GROUP ARROWS ────────────────────────────── */}
-
-        {/* Alpaca → Data Ingestor */}
-        <line x1="190" y1="50" x2="181" y2="76"
-          stroke="#94a3b8" strokeWidth="1.4" markerEnd="url(#arr)"
-          opacity={aOp("data", null)}/>
-
-        {/* News → LLM */}
-        <line x1="862" y1="50" x2="867" y2="76"
-          stroke="#d97706" strokeWidth="1.4" markerEnd="url(#arrA)"
-          opacity={aOp("llm", null)}/>
-
-        {/* Regime Classifier Agent → Strategy */}
-        <path d="M562 116 L562 152 L479 152 L479 176"
-          fill="none" stroke="#94a3b8" strokeWidth="1.4" markerEnd="url(#arr)"
-          opacity={aOp("data","strategy")}/>
-        <text x="522" y="148" textAnchor="middle" fontSize="8" fill={LBL}
-          opacity={aOp("data","strategy")}>regime signal</text>
-
-        {/* LLM → Strategy (dashed amber) */}
-        <path d="M867 116 L867 162 L694 162 L694 196"
-          fill="none" stroke="#d97706" strokeWidth="1.4" strokeDasharray="5 3" markerEnd="url(#arrA)"
-          opacity={aOp("llm","strategy")}/>
-        <text x="784" y="158" textAnchor="middle" fontSize="8" fill="#d97706"
-          opacity={aOp("llm","strategy")}>−1 / 0 / +1</text>
-
-        {/* Strategy → Risk */}
-        <line x1="479" y1="216" x2="409" y2="266"
-          stroke="#94a3b8" strokeWidth="1.4" markerEnd="url(#arr)"
-          opacity={aOp("strategy","risk")}/>
-        <text x="436" y="248" textAnchor="middle" fontSize="8" fill={LBL}
-          opacity={aOp("strategy","risk")}>TradeIntent</text>
-
-        {/* Risk → HALT */}
-        <line x1="554" y1="286" x2="596" y2="286"
-          stroke="#dc2626" strokeWidth="1.4" strokeDasharray="4 3" markerEnd="url(#arrR)"
-          opacity={aOp("risk", null)}/>
-        <text x="575" y="279" textAnchor="middle" fontSize="8" fill="#dc2626"
-          opacity={aOp("risk", null)}>veto</text>
-
-        {/* Risk → Order Router */}
-        <path d="M320 306 L320 336 L187 336 L187 356"
-          fill="none" stroke="#16a34a" strokeWidth="1.4" markerEnd="url(#arrG)"
-          opacity={aOp("risk","execution")}/>
-        <text x="254" y="332" textAnchor="middle" fontSize="8" fill="#16a34a"
-          opacity={aOp("risk","execution")}>approved order</text>
-
-        {/* Risk → Telegram (proposals + alerts) */}
-        <path d="M554 278 L810 278"
-          fill="none" stroke="#16a34a" strokeWidth="1.4" strokeDasharray="5 3" markerEnd="url(#arrG)"
-          opacity={aOp("risk", "telegram" as Section)}/>
-        <text x="680" y="274" textAnchor="middle" fontSize="8" fill="#16a34a"
-          opacity={aOp("risk", "telegram" as Section)}>proposals · alerts</text>
-
-        {/* Fill Handler → Telegram (fills) */}
-        <path d="M571 374 L571 420 L896 420 L896 308"
-          fill="none" stroke="#16a34a" strokeWidth="1.4" strokeDasharray="5 3" markerEnd="url(#arrG)"
-          opacity={aOp("execution", "telegram" as Section)}/>
-        <text x="740" y="416" textAnchor="middle" fontSize="8" fill="#16a34a"
-          opacity={aOp("execution", "telegram" as Section)}>fills</text>
-
-        {/* Telegram → Orchestrator (commands back) */}
-        <path d="M810 270 L790 270 L790 76 L190 76"
-          fill="none" stroke="#94a3b8" strokeWidth="1.4" strokeDasharray="4 3" markerEnd="url(#arr)"
-          opacity={aOp("telegram" as Section, null)}/>
-        <text x="800" y="173" textAnchor="middle" fontSize="8" fill={LBL}
-          opacity={aOp("telegram" as Section, null)}>approve · commands</text>
-
-        {/* Animated packet */}
-        {hover === null && (
-          <circle r="4" fill="#6366f1" opacity="0.75">
-            <animateMotion dur="5s" repeatCount="indefinite"
-              path="M190 12 L181 76 L365 96 L562 96 L562 152 L479 176 L409 266 L320 306 L187 356"/>
-          </circle>
-        )}
+        {/* ── Orchestrator / default-to-halt ── */}
+        {[110, 420, 660, 890].map((x) => (
+          <Edge key={x} d={`M${x} ${x === 110 ? 465 : x === 420 ? 465 : 395} L${x} 495`} kind="halt" />
+        ))}
+        <rect x="20" y="495" width="960" height="50" rx="10" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="1.2" strokeDasharray="5 3" />
+        <text x="500" y="515" textAnchor="middle" fontSize="11" fontWeight="700" fill="#334155">Orchestrator · stops safely on any problem</text>
+        <text x="500" y="532" textAnchor="middle" fontSize="9.5" fill="#475569">halts on a lost connection, stale data, a mismatch with the broker, or an error · resumes automatically only after connection or data issues</text>
       </svg>
-
-      {/* Info bar */}
-      <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800 min-h-[52px] flex items-center gap-3">
-        <div className={`w-1.5 h-7 rounded-full flex-shrink-0 transition-colors duration-150 ${
-          hover === "data"      ? "bg-sky-400"    :
-          hover === "llm"       ? "bg-amber-400"  :
-          hover === "strategy"  ? "bg-indigo-400" :
-          hover === "risk"      ? "bg-red-400"    :
-          hover === "execution" ? "bg-green-500"  :
-          hover === "telegram"  ? "bg-green-600"  : "bg-gray-300 dark:bg-gray-600"
-        }`}/>
-        {hover ? (
-          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-            <span className="font-semibold">{INFO[hover].title}: </span>
-            {INFO[hover].detail}
-          </p>
-        ) : (
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            Hover any section to understand its role in the system.
-          </p>
-        )}
-      </div>
+      <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
+        Several sources can suggest a trade, but every suggestion passes the same rule-based risk check and the owner{"'"}s approval before the one component allowed to trade acts. Every fill is checked against the broker, and any problem stops the system safely.
+      </p>
     </div>
   )
 }

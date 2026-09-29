@@ -8,7 +8,7 @@
 
 /* Light mode */
 :root {
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #111827; /* gray-900 */
 }
 
@@ -22,7 +22,7 @@ html.dark {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   transition: background-color 200ms ease, color 200ms ease;
 }
 

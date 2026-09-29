@@ -2,9 +2,9 @@ import Card from "@/components/ui/Card"
 
 export default function PublicationsPage() {
   return (
-    <section className="space-y-8 max-w-4xl mx-auto px-6 py-10">
+    <section className="max-w-4xl space-y-8 py-16">
 
-      <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-100">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
         Publications
       </h1>
 
@@ -18,7 +18,7 @@ export default function PublicationsPage() {
               Applied fine-tuned ResNet and DenseNet to classify choroidal neovascularization (CNV) from OCT images, with quantified performance benchmarks across architectures for early AMD diagnosis.
             </p>
             <p className="text-xs text-gray-500">
-              Springer · Intelligent Computing / AI · ICTIS'23
+              Springer · Intelligent Computing / AI · ICTIS&apos;23
             </p>
             <a
               href="https://link.springer.com/chapter/10.1007/978-981-99-3758-5_42"

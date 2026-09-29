@@ -14,39 +14,56 @@ export default function HomePage() {
   return (
     <>
       {/* HOME */}
-      <section id="home" className="space-y-12">
+      <section id="home" className="relative isolate space-y-12 overflow-hidden">
+
+        {/* decorative accent glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-0 left-1/2 -z-10 h-80 w-[46rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-400/30 via-violet-400/20 to-sky-300/20 blur-3xl dark:from-indigo-500/20 dark:via-violet-500/15 dark:to-sky-400/10"
+        />
 
         {/* HERO */}
-        <div className="max-w-4xl space-y-5">
+        <div className="max-w-4xl space-y-6 pt-4">
           <div className="flex flex-wrap gap-2">
             <Badge>AI Consultant Engineer · Deloitte</Badge>
             <Badge>LLMs · Agents · RAG · LLMOps</Badge>
           </div>
 
-          <h1 className="text-4xl font-semibold leading-tight text-gray-900 dark:text-gray-100">
-            Distributed agent systems, enterprise RAG, and cloud-native LLMOps, shipped across NIH, CDC, and VBA.
+          <h1 className="text-4xl sm:text-5xl font-bold leading-[1.1] tracking-tight text-gray-900 dark:text-gray-100">
+            Distributed agent systems, enterprise RAG, and{" "}
+            <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
+              cloud-native LLMOps
+            </span>
+            , shipped across NIH, CDC, and VBA.
           </h1>
 
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed">
             Full-stack AI engineering ownership: multi-agent orchestration, REST API design, AWS infrastructure, and observability, built for compliance-regulated, high-availability federal environments.
           </p>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-medium text-gray-500 dark:text-gray-400">
-            <span>$800K in new federal revenue</span>
-            <span>·</span>
-            <span>76% LLM latency reduction</span>
-            <span>·</span>
-            <span>2nd place · NAWCTSD AI Challenge</span>
+          <div className="flex flex-wrap gap-3">
+            {[
+              "$800K in new federal revenue",
+              "76% LLM latency reduction",
+              "2nd place · NAWCTSD AI Challenge",
+            ].map((stat) => (
+              <span
+                key={stat}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-900/60 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 backdrop-blur-sm"
+              >
+                {stat}
+              </span>
+            ))}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Button href="/#projects">View Projects</Button>
             <Button href="/#about" variant="secondary">About</Button>
           </div>
         </div>
 
         {/* CORE COMPETENCIES */}
-        <div className="space-y-4">
+        <div className="max-w-4xl space-y-4">
           <SectionHeading
             title="Core Competencies"
             subtitle="Engineering disciplines applied across every system shipped."

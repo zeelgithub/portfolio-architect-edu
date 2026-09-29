@@ -7,13 +7,11 @@ import { Github } from "lucide-react"
 
 export default function ProjectsPage() {
   return (
-    <section className="space-y-10">
+    <section className="max-w-4xl space-y-10 py-16">
       {/* Header */}
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-5xl font-bold text-center text-gray-900 dark:text-gray-100">
-          Projects
-        </h1>
-      </div>
+      <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100">
+        Projects
+      </h1>
 
       {/* Project cards */}
       <div className="grid gap-4 md:grid-cols-2">

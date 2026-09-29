@@ -4,20 +4,45 @@ import Link from "next/link"
 import AutonomousDebuggerArchitectureDiagram from "@/components/diagrams/AutonomousDebuggerArchitectureDiagram"
 import { projects } from "@/data/projects"
 
-export default function AutonomousDebuggerAssistantCaseStudy() {
-  const project = projects.find(
-    (p) => p.slug === "autonomous-debugger-assistant"
+const STATS = [
+  { value: "Failure → Fix", label: "from stack trace to a tested patch, end to end" },
+  { value: "Test-proven", label: "fixes accepted only after the real suite runs" },
+  { value: "Tool-isolated", label: "agents never write to the repo directly" },
+  { value: "Bounded", label: "escalates to a human after three attempts" },
+]
+
+const USE_CASES = [
+  { who: "Platform and DevOps teams", what: "Triage recurring CI failures automatically before they block the pipeline." },
+  { who: "Product engineering teams", what: "Offload routine failure diagnosis and patching, and keep senior engineers on feature work." },
+  { who: "AI engineering teams", what: "A reference pattern for agents that change code safely: tool-isolated, test-verified, and bounded." },
+]
+
+const AGENTS = ["Planner", "Log Analyzer", "Code Navigator", "Fix Generator", "Evaluator"]
+const TOOLS = ["Repository clone", "File mapping", "Patch with backup", "pytest runner"]
+
+function Chips({ items }: { items: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((r) => (
+        <span
+          key={r}
+          className="rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300"
+        >
+          {r}
+        </span>
+      ))}
+    </div>
   )
+}
+
+export default function AutonomousDebuggerAssistantCaseStudy() {
+  const project = projects.find((p) => p.slug === "autonomous-debugger-assistant")
 
   if (!project) {
     return (
       <section className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-semibold">
-          Autonomous Debugger Assistant
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Project data not found.
-        </p>
+        <h1 className="text-2xl font-semibold">Autonomous Debugger Assistant</h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">Project data not found.</p>
       </section>
     )
   }
@@ -27,73 +52,76 @@ export default function AutonomousDebuggerAssistantCaseStudy() {
       {/* Title */}
       <div className="space-y-3 text-center">
         <h1 className="text-3xl font-semibold">{project.title}</h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          A deterministic, multi-agent AI system for autonomous debugging and
-          repair of software failures.
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          {project.summary}
         </p>
+      </div>
+
+      {/* Impact at a glance */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {STATS.map((s) => (
+          <div key={s.label} className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
+            <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{s.value}</div>
+            <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">{s.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* Problem */}
       <div className="space-y-3">
         <h2 className="text-xl font-medium">Problem</h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          Built an autonomous multi-agent debugging system that analyzes CI failures, navigates codebases, and generates fixes.Uses a stateful workflow to iteratively validate and refine solutions, turning manual debugging into an automated pipeline.
-        </p>
-        {/* <p className="text-gray-600 dark:text-gray-300">
-          This work does not scale and repeatedly consumes senior engineering
-          time for routine issues.
-        </p> */}
+        <p className="text-gray-600 dark:text-gray-300">{project.problem}</p>
       </div>
 
-      {/* Solution */}
+      {/* Who It's For */}
       <div className="space-y-3">
-        <h2 className="text-xl font-medium">Solution</h2>
-        <p className="text-gray-600 dark:text-gray-300">
-         Developed an Autonomous Debugger Assistant, a multi-agent AI system automating structured debugging workflows. 
-         Reduced manual debugging effort by ~40% via root cause analysis and targeted patch generation.
-        </p>
-        <p className="text-gray-600 dark:text-gray-300">
-          Architected a LangGraph-based orchestration layer for iterative debugging and validation. 
-          Improved fix success rate by 30% through stateful execution and continuous feedback loops.
-        </p>
+        <h2 className="text-xl font-medium">Who It{"'"}s For</h2>
+        <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+          {USE_CASES.map((u) => (
+            <li key={u.who}>
+              <span className="font-semibold text-gray-900 dark:text-gray-100">{u.who}</span>
+              {": "}{u.what}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* What I Built */}
+      <div className="space-y-3">
+        <h2 className="text-xl font-medium">What I Built</h2>
+        <p className="text-gray-600 dark:text-gray-300">{project.solution}</p>
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Agents</p>
+        <Chips items={AGENTS} />
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Deterministic tools</p>
+        <Chips items={TOOLS} />
       </div>
 
       {/* Architecture */}
       <div className="space-y-4">
         <h2 className="text-xl font-medium">System Architecture</h2>
-
-        {/* ✅ THIS NOW RENDERS */}
         <AutonomousDebuggerArchitectureDiagram />
-
-        <ul className="list-disc pl-6 space-y-2 text-gray-600 dark:text-gray-300">
-          <li>LangGraph orchestrates execution as an explicit state machine</li>
-          <li>Planner, analyzer, fixer, and evaluator modeled as graph nodes</li>
-          <li>Evaluator exclusively controls retry, success, and escalation</li>
-          <li>Architectural guardrails enforce safe inputs and patches</li>
-          <li>Agents reason; tools execute side effects</li>
-        </ul>
       </div>
 
       {/* Key Design Decisions */}
       <div className="space-y-3">
         <h2 className="text-xl font-medium">Key Design Decisions</h2>
         <ul className="list-disc pl-6 space-y-2 text-gray-600 dark:text-gray-300">
-          <li>Explicit LangGraph state machine instead of implicit LLM chaining</li>
-          <li>Evaluator-controlled, bounded retry loop</li>
-          <li>Schema-validated LLM outputs for patch generation</li>
-          <li>Guardrails enforced architecturally, not via prompts</li>
-          <li>Strict separation of reasoning and execution</li>
+          {project.decisions.map((item) => {
+            const i = item.indexOf(". ")
+            return (
+              <li key={item}>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">{item.slice(0, i + 1)}</span>
+                {item.slice(i + 1)}
+              </li>
+            )
+          })}
         </ul>
       </div>
 
       {/* Outcomes */}
       <div className="space-y-3">
         <h2 className="text-xl font-medium">Outcomes</h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          Automates routine debugging workflows, reduces time to root-cause
-          identification, produces safe and minimal code fixes, and iterates
-          autonomously without human intervention.
-        </p>
+        <p className="text-gray-600 dark:text-gray-300">{project.outcomes}</p>
       </div>
 
       {/* GitHub */}
