@@ -33,7 +33,7 @@ export default function EducationPage() {
                       </p>
                     </div>
                     <span className="text-sm text-gray-600 dark:text-gray-400 italic">
-                      Aug 2025 – Present
+                      Aug 2025 – Expected 2027
                     </span>
                   </div>
 
